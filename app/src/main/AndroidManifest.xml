@@ -24,6 +24,7 @@
         <activity
             android:name=".Sebastian.LoginRegisterActivity"
             android:exported="false" />
+
         <activity
             android:name=".Yamir.GoogleActivity"
             android:exported="true">
