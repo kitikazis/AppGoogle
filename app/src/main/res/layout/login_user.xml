@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!-- Fondo rojo ovalado en la parte superior -->
+    <View
+        android:id="@+id/topBackground"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:background="@drawable/oval_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Contenedor del formulario de login -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/loginContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="-150dp"
+        app:layout_constraintTop_toBottomOf="@id/topBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#FFFFFF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Título del formulario -->
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LOGIN"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Campo de entrada de correo -->
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Correo"
+                android:inputType="textEmailAddress"
+                android:background="@android:color/transparent"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"/>
+
+            <!-- Campo de entrada de contraseña -->
+            <EditText
+                android:id="@+id/editTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
+                android:hint="Contraseña"
+                android:inputType="textPassword"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"/>
+
+
+            <!-- Botón de inicio de sesión -->
+            <Button
+                android:id="@+id/buttonLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#D32F2F"
+                android:padding="12dp"
+                android:text="Iniciar Sesión"
+                android:textColor="#FFFFFF"
+                android:textAllCaps="false"
+                android:layout_marginTop="24dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
