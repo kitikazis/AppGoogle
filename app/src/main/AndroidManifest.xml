@@ -12,28 +12,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppGoogle"
         tools:targetApi="31">
-        <activity
-            android:name=".Yamir.GoogleActivity"
-            android:exported="false" />
-        <activity
-            android:name=".GoogleMapaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity2"
-            android:exported="false" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB6PIhBBBdd6c7vItL6ANljT3TavnDIG74" />
 
+
+
         <activity
-            android:name=".Yamir.MapaActivity"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".Sebastian.LoginRegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Yamir.GoogleActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
