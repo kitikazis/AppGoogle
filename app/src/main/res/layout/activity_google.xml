@@ -57,6 +57,5 @@
         app:layout_constraintStart_toStartOf="@+id/map"
         app:layout_constraintTop_toTopOf="@+id/map"
         app:layout_constraintVertical_bias="0.797" />
-    " />
-    " />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
