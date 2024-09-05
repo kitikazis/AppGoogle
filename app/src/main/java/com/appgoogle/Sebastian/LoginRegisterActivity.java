@@ -29,8 +29,8 @@ public class LoginRegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login_register);
         tabLayout = findViewById(R.id.tab_layout);
         viewPager2 = findViewById(R.id.view_pager);
+        tabLayout.addTab(tabLayout.newTab().setText("Registro"));
         tabLayout.addTab(tabLayout.newTab().setText("Login"));
-        tabLayout.addTab(tabLayout.newTab().setText("Signup"));
         FragmentManager fragmentManager = getSupportFragmentManager();
         adapter = new ViewPageAdapter(fragmentManager, getLifecycle());
         viewPager2.setAdapter(adapter);

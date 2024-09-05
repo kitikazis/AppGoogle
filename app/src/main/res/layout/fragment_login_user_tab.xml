@@ -20,10 +20,18 @@
             android:layout_marginTop="20dp"
             android:padding="20dp">
 
-            <ImageView
+            <TextView
+                android:id="@+id/text_view_login_title"
                 android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:src="@drawable/signimg"/>
+                android:layout_height="wrap_content"
+                android:text="Registrarse"
+                android:textColor="#000000"
+                android:textSize="24sp"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
+
 
             <EditText
                 android:layout_width="300dp"
