@@ -62,14 +62,18 @@
 
 
             <Button
+                android:id="@+id/login_button"
                 android:layout_width="300dp"
                 android:layout_height="70dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
-                android:id="@+id/login_button"
+                android:backgroundTint="#E628A5DE"
+                android:text="Iniciar sesion"
                 android:textSize="18sp"
-                android:text="Login"
-                app:cornerRadius="30dp"/>
+                app:cornerRadius="30dp"
+                android:textColor="@color/white"
+                app:strokeColor="@color/white" />
+
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

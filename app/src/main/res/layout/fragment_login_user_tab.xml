@@ -83,9 +83,12 @@
                 android:layout_height="60dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="15dp"
-                android:text="Signup"
+                android:backgroundTint="#E628A5DE"
+                android:text="Registrarse"
                 android:textSize="18sp"
-                app:cornerRadius="30dp" />
+                app:cornerRadius="30dp"
+                android:textColor="@color/white"
+                app:strokeColor="@color/white" />
 
         </LinearLayout>
 
