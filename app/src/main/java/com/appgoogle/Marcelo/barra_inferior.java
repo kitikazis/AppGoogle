@@ -24,7 +24,7 @@ public class barra_inferior extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.action_explore) {
-                    // Acción para Explorar
+                    // Acción para Explorar cochinear
                     return true;
                 } else if (id == R.id.action_saved) {
                     // Llamar a TuVistaActivity
