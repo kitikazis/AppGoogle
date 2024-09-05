@@ -22,10 +22,10 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".Sebastian.LoginRegisterActivity"
+            android:name=".Yamir.GoogleActivity"
             android:exported="false" />
         <activity
-            android:name=".Yamir.GoogleActivity"
+            android:name=".Sebastian.LoginRegisterActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
