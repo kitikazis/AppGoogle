@@ -13,6 +13,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:layout_marginBottom="80dp"
         app:cameraZoom="10"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -23,19 +24,28 @@
         app:layout_constraintVertical_bias="0.0"
         app:uiZoomControls="true" />
 
-    <SearchView
-        android:id="@+id/mapSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="40dp"
-        android:queryHint="Buscar..."
-        android:iconifiedByDefault="false"
-        android:elevation="5dp"
+  <androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+      app:cardCornerRadius="50dp"
+      android:layout_marginTop="25dp"
+      android:layout_marginStart="20dp"
+      android:layout_marginEnd="20dp"
+      android:layout_marginBottom="1dp"
 
-        android:background="@drawable/bg_search_view"
-        app:layout_constraintEnd_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+    app:cardBackgroundColor="#FFFFFF"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
+
+        <SearchView
+            android:id="@+id/mapSearch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+
+            android:iconifiedByDefault="false"
+            android:queryHint="Busca aquí" />
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
