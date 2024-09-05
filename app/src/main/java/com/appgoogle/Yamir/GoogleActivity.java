@@ -1,11 +1,12 @@
 package com.appgoogle.Yamir;
 
 import android.os.Bundle;
-import android.view.MenuItem;
-import androidx.annotation.NonNull;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+
 import com.appgoogle.Marcelo.GuardadosFragment;
 import com.appgoogle.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,38 +21,46 @@ public class GoogleActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
             int itemId = item.getItemId();
 
             if (itemId == R.id.navigation_explore) {
                 getSupportFragmentManager().popBackStack(null, getSupportFragmentManager().POP_BACK_STACK_INCLUSIVE);
                 return true;
             } else if (itemId == R.id.navigation_saved) {
-                selectedFragment = new GuardadosFragment();
-            } else if (itemId == R.id.navigation_contribute) {
-                // Mostrar el diálogo de confirmación para salir de la aplicación
-                showExitConfirmationDialog();
-                return true;
-            }
-
-            if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, selectedFragment)
+                        .replace(R.id.fragment_container, new GuardadosFragment())
                         .addToBackStack(null)
                         .commit();
                 return true;
+            } else if (itemId == R.id.navigation_contribute) {
+                // Mostrar el diálogo de confirmación personalizado
+                showCustomExitDialog();
+                return true;
             }
+
             return false;
         });
     }
 
-    // Método para mostrar el diálogo de confirmación de salida
-    private void showExitConfirmationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Salir de la aplicación")
-                .setMessage("¿Estás seguro de que deseas salir?")
-                .setPositiveButton("Sí", (dialog, which) -> finish()) // Cierra la aplicación
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss()) // Cierra el diálogo y continúa la ejecución
-                .show();
+    // Método para mostrar el diálogo de confirmación personalizado
+    private void showCustomExitDialog() {
+        // Inflar el diseño del diálogo personalizado
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.custom_exit_dialog, null);
+
+        // Crear el AlertDialog
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        // Configurar los botones del diálogo
+        Button cancelButton = dialogView.findViewById(R.id.button_cancel);
+        Button exitButton = dialogView.findViewById(R.id.button_exit);
+
+        cancelButton.setOnClickListener(v -> alertDialog.dismiss()); // Cierra el diálogo
+        exitButton.setOnClickListener(v -> finish()); // Cierra la aplicación
+
+        // Mostrar el diálogo
+        alertDialog.show();
     }
 }
