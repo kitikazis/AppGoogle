@@ -5,5 +5,5 @@
     android:startColor="#137E7E"
     android:endColor="#00B2B2"
     android:tileMode="clamp" />
-    <corners android:radius="30dp" />
+    <corners android:radius="30dp" /> <!-- Bordes redondeados -->
 </shape>
