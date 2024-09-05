@@ -31,6 +31,8 @@ android {
 dependencies {
     //Implementaciones INCIO
     implementation libs.play.services.maps
+    implementation libs.play.services.location.v2101
+
     //Implemtanciones FIN
     implementation libs.appcompat
     implementation libs.material
