@@ -1,7 +1,6 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -15,21 +14,21 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="20dp"
+            android:orientation="vertical"
             android:padding="20dp">
 
             <TextView
                 android:id="@+id/text_view_login_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
                 android:text="Inicio de sesion"
                 android:textColor="#000000"
                 android:textSize="24sp"
-                android:layout_marginTop="20dp"
-                android:layout_gravity="center"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/login_email"
@@ -41,24 +40,42 @@
                 android:drawableLeft="@drawable/baseline_email_24"
                 android:drawablePadding="8dp"
                 android:hint="Email"
-                android:textColor="#000000"
-                android:textColorHint="#000000"
-                android:padding="8dp" />
-
-            <EditText
-                android:id="@+id/login_password"
-                android:layout_width="300dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
                 android:padding="8dp"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:drawableLeft="@drawable/baseline_lock_24"
-                android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"
                 android:textColor="#000000"
                 android:textColorHint="#000000" />
+
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginVertical="10dp"
+                android:background="#F7F8F9"
+                app:boxStrokeColor="#E8ECF4"
+                app:endIconMode="password_toggle"
+                app:hintTextColor="@color/text_light_v2">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/login_password"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/edittext_bkg"
+                    android:drawableStart="@drawable/baseline_lock_24"
+                    android:drawablePadding="8dp"
+
+                    android:hint="Contraseña"
+
+                    android:inputType="textPassword"
+                    android:padding="8dp"
+
+                    android:textColor="#000000"
+
+                    android:textColorHint="#000000" />
+            </com.google.android.material.textfield.TextInputLayout>
 
 
             <Button
@@ -69,9 +86,9 @@
                 android:layout_marginTop="30dp"
                 android:backgroundTint="#E628A5DE"
                 android:text="Iniciar sesion"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 app:cornerRadius="30dp"
-                android:textColor="@color/white"
                 app:strokeColor="@color/white" />
 
         </LinearLayout>
