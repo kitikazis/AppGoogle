@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_explore"
+        android:id="@+id/navigation_explore"
         android:icon="@drawable/ic_explore"
         android:title="Explorar" />
     <item
-        android:id="@+id/action_saved"
+        android:id="@+id/navigation_saved"
         android:icon="@drawable/ic_saved"
         android:title="Guardados" />
     <item
-        android:id="@+id/action_contribute"
+        android:id="@+id/navigation_contribute"
         android:icon="@drawable/ic_contribute"
-        android:title="Contribuir" />
+        android:title="Salir" />
 </menu>

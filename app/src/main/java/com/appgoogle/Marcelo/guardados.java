@@ -3,7 +3,6 @@ package com.appgoogle.Marcelo;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import com.appgoogle.R;
 
 public class guardados extends AppCompatActivity {
@@ -13,7 +12,5 @@ public class guardados extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guardados);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
     }
 }

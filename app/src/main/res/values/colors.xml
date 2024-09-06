@@ -2,5 +2,31 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="red">#FB0303</color>
+    <color name="blues">#1B6DF4</color>
+    <color name="primary">#075EB9</color>
+    <color name="primary_variant">#1261B5</color>
+    <color name="primary_variant_dark">#20488A</color>
+    <color name="secondary">#33c9dc</color>
+    <color name="secondary_variant">#18acc2</color>
+    <color name="secondary_variant_dark">#178ba3</color>
+    <color name="complementary_orange">#FFAB91</color>
+    <color name="complementary_green">#B9F6CA</color>
+    <color name="complementary_blue">#80D8FF</color>
+
+    <color name="text">#7D838D</color>
+    <color name="text_light">#C5CCD6</color>
+    <color name="text_light_v2">#8391A1</color>
+    <color name="text_dark">#5D636B</color>
+    <color name="text_dark_v2">#2F3E4D</color>
+    <color name="btn_light">#E9E9E9</color>
+    <color name="shimmer">#C8C8C9</color>
+    <color name="complementary_yellow">#FFD700</color>
+    <color name="complementary_purple">#9C27B0</color>
+    <color name="complementary_red">#E57373</color>
+    <color name="complementary_teal">#00897B</color>
+    <color name="complementary_light_green">#8BC34A</color>
+    <color name="complementary_pink">#F06292</color>
+    <color name="green">#0F825B</color>
+    <color name="red">#F50000</color>
+    <color name="btn_disabled">#E3E3E4</color>
 </resources>

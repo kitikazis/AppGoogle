@@ -2,16 +2,22 @@ package com.appgoogle.Yamir;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.appgoogle.Marcelo.GuardadosFragment;
 import com.appgoogle.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -22,21 +28,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 import java.util.List;
-//Yamir
+
 public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallback {
-    //Yamir
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap myMap;
     private SearchView mapSearchView;
     private Marker currentMarker;
-    private Button currentLocationButton; // Añadido
+    private Button currentLocationButton;
 
-    //Yamir
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +49,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
 
         // Configuración del SearchView
         mapSearchView = findViewById(R.id.mapSearch);
-        currentLocationButton = findViewById(R.id.currentLocationButton); // Inicializado
+        currentLocationButton = findViewById(R.id.currentLocationButton);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Configurar el fragmento del mapa
@@ -103,6 +107,29 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
 
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.navigation_explore) {
+                getSupportFragmentManager().popBackStack(null, getSupportFragmentManager().POP_BACK_STACK_INCLUSIVE);
+                return true;
+            } else if (itemId == R.id.navigation_saved) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new GuardadosFragment())
+                        .addToBackStack(null)
+                        .commit();
+                return true;
+            } else if (itemId == R.id.navigation_contribute) {
+                // Mostrar el diálogo de confirmación personalizado
+                showCustomExitDialog();
+                return true;
+            }
+
+            return false;
+        });
+
         // Configurar el botón para centrar en la ubicación actual
         currentLocationButton.setOnClickListener(v -> {
             if (myMap != null) {
@@ -110,7 +137,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
     }
-    //Yamir
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         myMap = googleMap;
@@ -126,8 +153,28 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
+    // Método para mostrar el diálogo de confirmación personalizado
+    private void showCustomExitDialog() {
+        // Inflar el diseño del diálogo personalizado
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.custom_exit_dialog, null);
 
-    //Yamir
+        // Crear el AlertDialog
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        // Configurar los botones del diálogo
+        Button cancelButton = dialogView.findViewById(R.id.button_cancel);
+        Button exitButton = dialogView.findViewById(R.id.button_exit);
+
+        cancelButton.setOnClickListener(v -> alertDialog.dismiss()); // Cierra el diálogo
+        exitButton.setOnClickListener(v -> finish()); // Cierra la aplicación
+
+        // Mostrar el diálogo
+        alertDialog.show();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -140,7 +187,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         }
     }
-    //Yamir
+
     private void getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -161,6 +208,4 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                     });
         }
     }
-
-
 }
