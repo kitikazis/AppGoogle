@@ -7,14 +7,11 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.SearchView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import com.appgoogle.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -25,12 +22,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
 
 import java.io.IOException;
 import java.util.List;
-
+//Yamir
 public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallback {
+    //Yamir
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap myMap;
@@ -38,6 +36,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     private Marker currentMarker;
     private Button currentLocationButton; // Añadido
 
+    //Yamir
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +110,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
     }
+    //Yamir
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         myMap = googleMap;
@@ -127,7 +127,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     }
 
 
-
+    //Yamir
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -140,6 +140,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         }
     }
+    //Yamir
     private void getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
