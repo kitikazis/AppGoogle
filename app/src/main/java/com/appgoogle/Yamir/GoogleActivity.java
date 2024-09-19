@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -12,11 +13,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import android.location.Location;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.appgoogle.Marcelo.GuardadosFragment;
 import com.appgoogle.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -28,9 +37,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -40,6 +56,8 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     private SearchView mapSearchView;
     private Marker currentMarker;
     private Button currentLocationButton;
+    private LatLng currentLatLng;  // Para guardar la ubicación actual
+    private Polyline currentPolyline; // Para dibujar la línea del trayecto
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -142,15 +160,108 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(@NonNull GoogleMap googleMap) {
         myMap = googleMap;
 
-        // Verificar permisos de ubicación
+        // Configuración inicial
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            // Habilitar la capa de ubicación en tiempo real (bolita azul)
             myMap.setMyLocationEnabled(true);
+            getCurrentLocation();
         }
+
+        // Detectar clics en el mapa
+        myMap.setOnMapClickListener(latLng -> {
+            if (currentLatLng != null) {
+                // Elimina el trayecto anterior si existe
+                if (currentPolyline != null) {
+                    currentPolyline.remove();
+                }
+
+                // Dibuja el trayecto
+                currentPolyline = myMap.addPolyline(new PolylineOptions()
+                        .add(currentLatLng, latLng)
+                        .width(5)
+                        .color(Color.BLUE));
+
+                // Calcular la ruta y obtener la distancia y el tiempo
+                calculateRoute(currentLatLng, latLng);
+            }
+        });
+    }
+
+    private void calculateRoute(LatLng origin, LatLng destination) {
+        String apiKey = "AIzaSyB6PIhBBBdd6c7vItL6ANljT3TavnDIG74"; // Reemplaza con tu API Key
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + origin.latitude + "," + origin.longitude +
+                "&destination=" + destination.latitude + "," + destination.longitude +
+                "&key=" + apiKey;
+
+        // Usar Volley para hacer la solicitud HTTP
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONArray routes = jsonObject.getJSONArray("routes");
+                        if (routes.length() > 0) {
+                            JSONObject route = routes.getJSONObject(0);
+                            JSONObject legs = route.getJSONArray("legs").getJSONObject(0);
+                            String distance = legs.getJSONObject("distance").getString("text");
+                            String duration = legs.getJSONObject("duration").getString("text");
+
+                            // Mostrar la distancia y el tiempo estimado
+                            Toast.makeText(this, "Distancia: " + distance + ", Tiempo: " + duration, Toast.LENGTH_LONG).show();
+
+                            // Eliminar la polilínea anterior si existe
+                            if (currentPolyline != null) {
+                                currentPolyline.remove();
+                            }
+
+                            // Extraer las coordenadas de la ruta y dibujarla
+                            List<LatLng> path = decodePolyline(route.getJSONObject("overview_polyline").getString("points"));
+                            currentPolyline = myMap.addPolyline(new PolylineOptions()
+                                    .addAll(path)
+                                    .width(5)
+                                    .color(Color.BLUE));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> Toast.makeText(this, "Error al obtener la ruta", Toast.LENGTH_SHORT).show());
+
+        queue.add(stringRequest);
+    }
+
+    private List<LatLng> decodePolyline(String encoded) {
+        List<LatLng> poly = new ArrayList<>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result >> 1) ^ -(result & 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result >> 1) ^ -(result & 1));
+            lng += dlng;
+
+            LatLng p = new LatLng(((double) lat / 1E5), ((double) lng / 1E5));
+            poly.add(p);
+        }
+        return poly;
     }
 
     // Método para mostrar el diálogo de confirmación personalizado
@@ -195,7 +306,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                     .addOnSuccessListener(this, location -> {
                         if (location != null) {
                             // Obtiene la latitud y longitud actuales
-                            LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
                             // Centra la cámara en la ubicación actual
                             myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));  // Ajusta el nivel de zoom
@@ -204,6 +315,11 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                             if (currentMarker != null) {
                                 currentMarker.remove(); // Elimina cualquier marcador anterior si existía
                             }
+
+                            // Añadir un marcador en la ubicación actual
+                            currentMarker = myMap.addMarker(new MarkerOptions()
+                                    .position(currentLatLng)
+                                    .title("Ubicación actual"));
                         }
                     });
         }
