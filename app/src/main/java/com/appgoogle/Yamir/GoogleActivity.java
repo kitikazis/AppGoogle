@@ -10,8 +10,11 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,7 +47,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -55,6 +61,9 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     private Button currentLocationButton;
     private LatLng currentLatLng;
     private Polyline currentPolyline;
+    private Map<String, List<LatLng>> districtRoutes;
+    private String currentDistrict;
+    private Spinner districtSpinner;
 
     private final LatLng[] touristLocations = {
             new LatLng(-12.0464, -77.0428), // Centro de Lima
@@ -73,10 +82,17 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         currentLocationButton = findViewById(R.id.currentLocationButton);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        districtSpinner = findViewById(R.id.district_spinner);
+        setupDistrictRoutes();
+        setupDistrictSpinner();
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+
+
 
         mapSearchView.setIconifiedByDefault(false);
         mapSearchView.setQueryHint("Buscar lugar...");
@@ -175,10 +191,36 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                 calculateRoute(currentLatLng, latLng);
             }
         });
+        if (currentDistrict != null) {
+            addDistrictMarkers();
+            drawDistrictRoute();
+        }
 
         addTouristMarkers();
     }
+    private void addDistrictMarkers() {
+        List<LatLng> locations = districtRoutes.get(currentDistrict);
+        if (locations != null) {
+            for (int i = 0; i < locations.size(); i++) {
+                LatLng location = locations.get(i);
+                myMap.addMarker(new MarkerOptions()
+                        .position(location)
+                        .title("Punto " + (i + 1))
+                );
+            }
+            // Center the map on the first location of the route
+            myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 14));
+        }
+    }
 
+    private void drawDistrictRoute() {
+        List<LatLng> locations = districtRoutes.get(currentDistrict);
+        if (locations != null) {
+            for (int i = 0; i < locations.size() - 1; i++) {
+                calculateRoute(locations.get(i), locations.get(i + 1));
+            }
+        }
+    }
     private void searchLocation(String location) {
         Geocoder geocoder = new Geocoder(GoogleActivity.this);
         try {
@@ -338,4 +380,58 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         }
     }
+
+    private void setupDistrictRoutes() {
+        districtRoutes = new HashMap<>();
+
+        // Miraflores route
+        districtRoutes.put("Miraflores", Arrays.asList(
+                new LatLng(-12.1111, -77.0316), // Parque Kennedy
+                new LatLng(-12.1317, -77.0299), // Parque del Amor
+                new LatLng(-12.1328, -77.0279), // Larcomar
+                new LatLng(-12.1250, -77.0305)  // Huaca Pucllana
+        ));
+
+        // Barranco route
+        districtRoutes.put("Barranco", Arrays.asList(
+                new LatLng(-12.1492, -77.0220), // Puente de los Suspiros
+                new LatLng(-12.1503, -77.0223), // Plaza de Barranco
+                new LatLng(-12.1478, -77.0217), // MATE Museo
+                new LatLng(-12.1470, -77.0185)  // Playa Barranco
+        ));
+
+        // Centro de Lima route
+        districtRoutes.put("Centro de Lima", Arrays.asList(
+                new LatLng(-12.0464, -77.0428), // Plaza Mayor
+                new LatLng(-12.0458, -77.0314), // Palacio de Gobierno
+                new LatLng(-12.0452, -77.0305), // Catedral de Lima
+                new LatLng(-12.0548, -77.0351)  // Convento de San Francisco
+        ));
+
+        // Add more districts and their routes as needed
+    }
+
+    private void setupDistrictSpinner() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                new ArrayList<>(districtRoutes.keySet()));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        districtSpinner.setAdapter(adapter);
+
+        districtSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                currentDistrict = (String) parent.getItemAtPosition(position);
+                if (myMap != null) {
+                    myMap.clear(); // Clear previous markers and routes
+                    addDistrictMarkers();
+                    drawDistrictRoute();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
 }
