@@ -71,6 +71,8 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             new LatLng(-12.1708, -77.0272), // Larcomar
             new LatLng(-12.0474, -77.0307)  // Plaza Mayor
     };
+    private Map<String, List<String>> districtNames = new HashMap<>();
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -140,6 +142,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         myMap = googleMap;
@@ -198,20 +201,27 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
 
         addTouristMarkers();
     }
+
+
+
     private void addDistrictMarkers() {
         List<LatLng> locations = districtRoutes.get(currentDistrict);
         if (locations != null) {
             for (int i = 0; i < locations.size(); i++) {
                 LatLng location = locations.get(i);
+                String title = districtNames.get(currentDistrict).get(i); // Obtén el nombre correspondiente
                 myMap.addMarker(new MarkerOptions()
                         .position(location)
-                        .title("Punto " + (i + 1))
+                        .title(title) // Usa el nombre en lugar de "Punto (número)"
                 );
             }
-            // Center the map on the first location of the route
+            // Centrar el mapa en la primera ubicación de la ruta
             myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 14));
         }
     }
+
+
+
 
     private void drawDistrictRoute() {
         List<LatLng> locations = districtRoutes.get(currentDistrict);
@@ -392,6 +402,14 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                 new LatLng(-12.1250, -77.0305)  // Huaca Pucllana
         ));
 
+        // Nombres para Miraflores
+        List<String> mirafloresNames = Arrays.asList(
+                "Parque Kennedy",
+                "Parque del Amor",
+                "Larcomar",
+                "Huaca Pucllana"
+        );
+
         // Barranco route
         districtRoutes.put("Barranco", Arrays.asList(
                 new LatLng(-12.1492, -77.0220), // Puente de los Suspiros
@@ -399,6 +417,14 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                 new LatLng(-12.1478, -77.0217), // MATE Museo
                 new LatLng(-12.1470, -77.0185)  // Playa Barranco
         ));
+
+        // Nombres para Barranco
+        List<String> barrancoNames = Arrays.asList(
+                "Puente de los Suspiros",
+                "Plaza de Barranco",
+                "MATE Museo",
+                "Playa Barranco"
+        );
 
         // Centro de Lima route
         districtRoutes.put("Centro de Lima", Arrays.asList(
@@ -408,8 +434,20 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                 new LatLng(-12.0548, -77.0351)  // Convento de San Francisco
         ));
 
-        // Add more districts and their routes as needed
+        // Nombres para Centro de Lima
+        List<String> centroLimaNames = Arrays.asList(
+                "Plaza Mayor",
+                "Palacio de Gobierno",
+                "Catedral de Lima",
+                "Convento de San Francisco"
+        );
+
+        // Agrega los nombres al mapa
+        districtNames.put("Miraflores", mirafloresNames);
+        districtNames.put("Barranco", barrancoNames);
+        districtNames.put("Centro de Lima", centroLimaNames);
     }
+
 
     private void setupDistrictSpinner() {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
