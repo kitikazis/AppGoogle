@@ -53,10 +53,15 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     private SearchView mapSearchView;
     private Marker currentMarker;
     private Button currentLocationButton;
-    private LatLng currentLatLng;  // Para guardar la ubicación actual
-    private Polyline currentPolyline; // Para dibujar la línea del trayecto
-    private LatLng casaLocation = new LatLng(-12.026648621755285, -77.0661004023951); // Cambia a las coordenadas de tu casa
-    private LatLng trabajoLocation = new LatLng(-12.054194835953066, -77.08005943707185); // Cambia a las coordenadas de tu trabajo
+    private LatLng currentLatLng;
+    private Polyline currentPolyline;
+
+    private final LatLng[] touristLocations = {
+            new LatLng(-12.0464, -77.0428), // Centro de Lima
+            new LatLng(-12.1177, -77.0282), // Parque Kennedy
+            new LatLng(-12.1708, -77.0272), // Larcomar
+            new LatLng(-12.0474, -77.0307)  // Plaza Mayor
+    };
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -64,19 +69,14 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_google);
 
-        // Configuración del SearchView
         mapSearchView = findViewById(R.id.mapSearch);
         currentLocationButton = findViewById(R.id.currentLocationButton);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Configurar el fragmento del mapa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
-
-        // Manejar el Intent que puede contener la ubicación
-        handleIncomingIntent();
 
         mapSearchView.setIconifiedByDefault(false);
         mapSearchView.setQueryHint("Buscar lugar...");
@@ -84,38 +84,9 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         mapSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Realiza la búsqueda de la ubicación
                 if (myMap != null) {
-                    String location = mapSearchView.getQuery().toString();
-                    List<Address> addressList = null;
-                    if (location != null && !location.isEmpty()) {
-                        Geocoder geocoder = new Geocoder(GoogleActivity.this);
-                        try {
-                            // Buscar la ubicación usando el Geocoder
-                            addressList = geocoder.getFromLocationName(location, 1);
-                            if (addressList != null && !addressList.isEmpty()) {
-                                Address address = addressList.get(0);
-                                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-
-                                // Elimina el marcador anterior si existe
-                                if (currentMarker != null) {
-                                    currentMarker.remove();
-                                }
-
-                                // Añade el nuevo marcador en la ubicación buscada
-                                currentMarker = myMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .title(location));
-
-                                // Mueve la cámara del mapa a la ubicación buscada
-                                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    searchLocation(query);
                 }
-                // Limpiar el campo de búsqueda después de enviar la consulta
                 mapSearchView.setQuery("", false);
                 mapSearchView.clearFocus();
                 return false;
@@ -128,10 +99,8 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-
             if (itemId == R.id.navigation_explore) {
                 getSupportFragmentManager().popBackStack(null, getSupportFragmentManager().POP_BACK_STACK_INCLUSIVE);
                 return true;
@@ -142,15 +111,12 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                         .commit();
                 return true;
             } else if (itemId == R.id.navigation_contribute) {
-                // Mostrar el diálogo de confirmación personalizado
                 showCustomExitDialog();
                 return true;
             }
-
             return false;
         });
 
-        // Configurar el botón para centrar en la ubicación actual
         currentLocationButton.setOnClickListener(v -> {
             if (myMap != null) {
                 getCurrentLocation();
@@ -162,7 +128,6 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(@NonNull GoogleMap googleMap) {
         myMap = googleMap;
 
-        // Configuración inicial
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -171,6 +136,26 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             myMap.setMyLocationEnabled(true);
             getCurrentLocation();
         }
+
+        // Centrar el mapa en Lima, Perú
+        LatLng limaLocation = new LatLng(-12.046374, -77.042793); // Coordenadas de Lima
+        myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(limaLocation, 10)); // Ajusta el nivel de zoom
+
+        // Dibujar línea desde la ubicación actual hasta Lima
+        myMap.setOnMyLocationChangeListener(location -> {
+            LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+            // Elimina la polilínea anterior si existe
+            if (currentPolyline != null) {
+                currentPolyline.remove();
+            }
+
+            // Dibuja la línea hacia Lima
+            currentPolyline = myMap.addPolyline(new PolylineOptions()
+                    .add(currentLatLng, limaLocation)
+                    .width(5)
+                    .color(Color.BLUE));
+        });
 
         // Detectar clics en el mapa
         myMap.setOnMapClickListener(latLng -> {
@@ -190,26 +175,35 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                 calculateRoute(currentLatLng, latLng);
             }
         });
+
+        addTouristMarkers();
     }
 
-    private void handleIncomingIntent() {
-        String location = getIntent().getStringExtra("location");
-        if (location != null) {
-            LatLng targetLocation;
-            if (location.equals("casa")) {
-                targetLocation = casaLocation; // Usa las coordenadas de casa
-            } else if (location.equals("trabajo")) {
-                targetLocation = trabajoLocation; // Usa las coordenadas de trabajo
-            } else {
-                targetLocation = null;
-            }
+    private void searchLocation(String location) {
+        Geocoder geocoder = new Geocoder(GoogleActivity.this);
+        try {
+            List<Address> addressList = geocoder.getFromLocationName(location, 1);
+            if (addressList != null && !addressList.isEmpty()) {
+                Address address = addressList.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 
-            // Si hay una ubicación válida, centrar el mapa
-            if (targetLocation != null && myMap != null) {
-                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetLocation, 15));
-                // Añadir un marcador en la ubicación seleccionada
-                myMap.addMarker(new MarkerOptions().position(targetLocation).title(location));
+                if (currentMarker != null) {
+                    currentMarker.remove();
+                }
+                currentMarker = myMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addTouristMarkers() {
+        String[] locationsNames = {"Centro de Lima", "Parque Kennedy", "Larcomar", "Plaza Mayor"};
+
+        for (int i = 0; i < touristLocations.length; i++) {
+            LatLng location = touristLocations[i];
+            myMap.addMarker(new MarkerOptions().position(location).title(locationsNames[i]));
         }
     }
 
@@ -219,7 +213,6 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                 "&destination=" + destination.latitude + "," + destination.longitude +
                 "&key=" + apiKey;
 
-        // Usar Volley para hacer la solicitud HTTP
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 response -> {
@@ -232,30 +225,17 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                             String distance = legs.getJSONObject("distance").getString("text");
                             String duration = legs.getJSONObject("duration").getString("text");
 
-                            // Mostrar la distancia y el tiempo estimado
                             Toast.makeText(this, "Distancia: " + distance + ", Tiempo: " + duration, Toast.LENGTH_LONG).show();
 
-                            // Eliminar la polilínea anterior si existe
                             if (currentPolyline != null) {
                                 currentPolyline.remove();
                             }
 
-                            // Extraer las coordenadas de la ruta y dibujarla
                             List<LatLng> path = decodePolyline(route.getJSONObject("overview_polyline").getString("points"));
                             currentPolyline = myMap.addPolyline(new PolylineOptions()
                                     .addAll(path)
                                     .width(5)
                                     .color(Color.BLUE));
-
-                            // Mostrar las instrucciones de cada paso de la ruta
-                            JSONArray steps = legs.getJSONArray("steps");
-                            for (int i = 0; i < steps.length(); i++) {
-                                JSONObject step = steps.getJSONObject(i);
-                                String instruction = step.getString("html_instructions");
-                                // Quitar etiquetas HTML de las instrucciones
-                                instruction = instruction.replaceAll("<[^>]*>", "");
-                                Toast.makeText(this, "Paso " + (i + 1) + ": " + instruction, Toast.LENGTH_LONG).show();
-                            }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -265,7 +245,6 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
 
         queue.add(stringRequest);
     }
-
 
     private List<LatLng> decodePolyline(String encoded) {
         List<LatLng> poly = new ArrayList<>();
@@ -298,64 +277,63 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         return poly;
     }
 
-    // Método para mostrar el diálogo de confirmación personalizado
     private void showCustomExitDialog() {
-        // Inflar el diseño del diálogo personalizado
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.custom_exit_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
-        // Crear el AlertDialog
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .create();
-
-        // Configurar los botones del diálogo
-        Button cancelButton = dialogView.findViewById(R.id.button_cancel);
-        Button exitButton = dialogView.findViewById(R.id.button_exit);
-
-        cancelButton.setOnClickListener(v -> alertDialog.dismiss()); // Cierra el diálogo
-        exitButton.setOnClickListener(v -> finish()); // Cierra la aplicación
-
-        // Mostrar el diálogo
-        alertDialog.show();
+        dialogView.findViewById(R.id.button_exit).setOnClickListener(v -> finish());
+        dialogView.findViewById(R.id.button_cancel).setOnClickListener(v -> dialog.dismiss());
     }
+
+
+
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentLocation() {
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        if (currentMarker != null) {
+                            currentMarker.remove();
+                        }
+                        currentMarker = myMap.addMarker(new MarkerOptions().position(currentLatLng).title("Ubicación Actual"));
+                        myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+                    }
+                });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     myMap.setMyLocationEnabled(true);
+                    getCurrentLocation();
                 }
+            } else {
+                Toast.makeText(this, "Se necesita permiso de ubicación", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    private void getCurrentLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, location -> {
-                        if (location != null) {
-                            // Obtiene la latitud y longitud actuales
-                            currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-                            // Centra la cámara en la ubicación actual
-                            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));  // Ajusta el nivel de zoom
-
-                            // No añadir ningún marcador manual
-                            if (currentMarker != null) {
-                                currentMarker.remove(); // Elimina cualquier marcador anterior si existía
-                            }
-
-                            // Añadir un marcador en la ubicación actual
-                            currentMarker = myMap.addMarker(new MarkerOptions()
-                                    .position(currentLatLng)
-                                    .title("Ubicación actual"));
-                        }
-                    });
         }
     }
 }
