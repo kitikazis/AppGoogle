@@ -3,7 +3,6 @@ package com.appgoogle.Yamir;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -14,16 +13,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.location.Location;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.appgoogle.Marcelo.GuardadosFragment;
@@ -58,6 +55,8 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
     private Button currentLocationButton;
     private LatLng currentLatLng;  // Para guardar la ubicación actual
     private Polyline currentPolyline; // Para dibujar la línea del trayecto
+    private LatLng casaLocation = new LatLng(-12.026648621755285, -77.0661004023951); // Cambia a las coordenadas de tu casa
+    private LatLng trabajoLocation = new LatLng(-12.054194835953066, -77.08005943707185); // Cambia a las coordenadas de tu trabajo
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -75,6 +74,9 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        // Manejar el Intent que puede contener la ubicación
+        handleIncomingIntent();
 
         mapSearchView.setIconifiedByDefault(false);
         mapSearchView.setQueryHint("Buscar lugar...");
@@ -190,8 +192,29 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
+    private void handleIncomingIntent() {
+        String location = getIntent().getStringExtra("location");
+        if (location != null) {
+            LatLng targetLocation;
+            if (location.equals("casa")) {
+                targetLocation = casaLocation; // Usa las coordenadas de casa
+            } else if (location.equals("trabajo")) {
+                targetLocation = trabajoLocation; // Usa las coordenadas de trabajo
+            } else {
+                targetLocation = null;
+            }
+
+            // Si hay una ubicación válida, centrar el mapa
+            if (targetLocation != null && myMap != null) {
+                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetLocation, 15));
+                // Añadir un marcador en la ubicación seleccionada
+                myMap.addMarker(new MarkerOptions().position(targetLocation).title(location));
+            }
+        }
+    }
+
     private void calculateRoute(LatLng origin, LatLng destination) {
-        String apiKey = "AIzaSyB6PIhBBBdd6c7vItL6ANljT3TavnDIG74"; // Reemplaza con tu API Key
+        String apiKey = "YOUR_API_KEY"; // Reemplaza con tu API Key
         String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + origin.latitude + "," + origin.longitude +
                 "&destination=" + destination.latitude + "," + destination.longitude +
                 "&key=" + apiKey;
@@ -223,6 +246,16 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                                     .addAll(path)
                                     .width(5)
                                     .color(Color.BLUE));
+
+                            // Mostrar las instrucciones de cada paso de la ruta
+                            JSONArray steps = legs.getJSONArray("steps");
+                            for (int i = 0; i < steps.length(); i++) {
+                                JSONObject step = steps.getJSONObject(i);
+                                String instruction = step.getString("html_instructions");
+                                // Quitar etiquetas HTML de las instrucciones
+                                instruction = instruction.replaceAll("<[^>]*>", "");
+                                Toast.makeText(this, "Paso " + (i + 1) + ": " + instruction, Toast.LENGTH_LONG).show();
+                            }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -232,6 +265,7 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
 
         queue.add(stringRequest);
     }
+
 
     private List<LatLng> decodePolyline(String encoded) {
         List<LatLng> poly = new ArrayList<>();
