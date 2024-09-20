@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <!-- Permisos de ubicación -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,12 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppGoogle"
         tools:targetApi="31">
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB6PIhBBBdd6c7vItL6ANljT3TavnDIG74" />
 
-
-
+        <!-- Declaración de otras actividades -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
@@ -35,6 +37,7 @@
             </intent-filter>
         </activity>
 
+        <!-- Agrega aquí la nueva actividad -->
+        <activity android:name=".Yamir.VistaBotonesRutasActivity" />
     </application>
-
 </manifest>

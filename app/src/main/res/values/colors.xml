@@ -33,7 +33,10 @@
 
     //Sebas
     <color name="lavender">#158BD7</color>
-
+    <color name="green_light">#40F321</color>
+    <color name="green_dark">#4CAF50</color>
+    <color name="gray">#263238</color>
+    <color name="dark_gray">#212121</color>
 
 
 

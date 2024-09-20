@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -121,7 +122,12 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                         .addToBackStack(null)
                         .commit();
                 return true;
-            } else if (itemId == R.id.navigation_contribute) {
+            } else if (itemId == R.id.navigation_explore123) { // Usa el ID correcto para el botón
+                Intent intent = new Intent(GoogleActivity.this, VistaBotonesRutasActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            else if (itemId == R.id.navigation_contribute) {
                 // Mostrar el diálogo de confirmación personalizado
                 showCustomExitDialog();
                 return true;

@@ -9,6 +9,10 @@
         android:icon="@drawable/ic_saved"
         android:title="Guardados" />
     <item
+        android:id="@+id/navigation_explore123"
+        android:icon="@drawable/ic_saved"
+        android:title="Ver rutas" />
+    <item
         android:id="@+id/navigation_contribute"
         android:icon="@drawable/ic_contribute"
         android:title="Salir" />
