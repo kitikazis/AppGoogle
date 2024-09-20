@@ -38,6 +38,14 @@
             android:iconifiedByDefault="false"
             android:queryHint="Buscar lugar..." />
     </androidx.cardview.widget.CardView>
+
+    <Spinner
+        android:id="@+id/district_spinner"
+        android:layout_width="387dp"
+        android:layout_height="22dp"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/currentLocationButton"
+        app:layout_constraintStart_toStartOf="@+id/map" />
     <!-- Botón para centrar en la ubicación actual -->
     <Button
         android:id="@+id/currentLocationButton"

@@ -32,6 +32,8 @@ dependencies {
     //Implementaciones INCIO
     implementation libs.play.services.maps
     implementation libs.play.services.location.v2101
+    implementation libs.google.maps.services
+    implementation libs.volley
 
     //Implemtanciones FIN
     implementation libs.appcompat
