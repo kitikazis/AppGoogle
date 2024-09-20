@@ -205,10 +205,22 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
             LatLng location = touristLocations[i];
             myMap.addMarker(new MarkerOptions().position(location).title(locationsNames[i]));
         }
+
+        // Draw route between tourist locations
+        drawTouristRoute();
     }
 
+    private void drawTouristRoute() {
+        for (int i = 0; i < touristLocations.length - 1; i++) {
+            calculateRoute(touristLocations[i], touristLocations[i + 1]);
+        }
+    }
+
+
+
+
     private void calculateRoute(LatLng origin, LatLng destination) {
-        String apiKey = "YOUR_API_KEY"; // Reemplaza con tu API Key
+        String apiKey = "YOUR_ACTUAL_API_KEY"; // Replace with your actual API key
         String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + origin.latitude + "," + origin.longitude +
                 "&destination=" + destination.latitude + "," + destination.longitude +
                 "&key=" + apiKey;
@@ -221,18 +233,8 @@ public class GoogleActivity extends AppCompatActivity implements OnMapReadyCallb
                         JSONArray routes = jsonObject.getJSONArray("routes");
                         if (routes.length() > 0) {
                             JSONObject route = routes.getJSONObject(0);
-                            JSONObject legs = route.getJSONArray("legs").getJSONObject(0);
-                            String distance = legs.getJSONObject("distance").getString("text");
-                            String duration = legs.getJSONObject("duration").getString("text");
-
-                            Toast.makeText(this, "Distancia: " + distance + ", Tiempo: " + duration, Toast.LENGTH_LONG).show();
-
-                            if (currentPolyline != null) {
-                                currentPolyline.remove();
-                            }
-
                             List<LatLng> path = decodePolyline(route.getJSONObject("overview_polyline").getString("points"));
-                            currentPolyline = myMap.addPolyline(new PolylineOptions()
+                            myMap.addPolyline(new PolylineOptions()
                                     .addAll(path)
                                     .width(5)
                                     .color(Color.BLUE));
